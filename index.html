@@ -1,0 +1,1349 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Oasis | Politmine</title>
+	<link href="https://fonts.googleapis.com/css?family=Exo:400,700" rel="stylesheet">
+	<style>
+		:root {
+			--primary-color: #057deb;
+			--secondary-color: #1f91f5;
+			--accent-color: #d4af37;
+			--accent-secondary: #e74c3c;
+			--dark-color: #212529;
+			--light-color: #f9f9f9;
+			--text-color: #333;
+			--success-color: #27ae60;
+			--warning-color: #f39c12;
+		}
+		
+		* {
+			margin: 0;
+			padding: 0;
+			box-sizing: border-box;
+		}
+
+		body {
+			font-family: 'Exo', sans-serif;
+			background-color: var(--light-color);
+			color: var(--text-color);
+			line-height: 1.6;
+			opacity: 0;
+			animation: fadeIn 1s ease forwards;
+			min-height: 100vh;
+			display: flex;
+			flex-direction: column;
+		}
+
+		@keyframes fadeIn {
+			to { opacity: 1; }
+		}
+
+		/* Парящие анимации */
+		@keyframes float {
+			0%, 100% { transform: translateY(0); }
+			50% { transform: translateY(-10px); }
+		}
+
+		@keyframes pulse {
+			0%, 100% { transform: scale(1); }
+			50% { transform: scale(1.05); }
+		}
+
+		@keyframes slideInFromLeft {
+			from { transform: translateX(-50px); opacity: 0; }
+			to { transform: translateX(0); opacity: 1; }
+		}
+
+		@keyframes slideInFromRight {
+			from { transform: translateX(50px); opacity: 0; }
+			to { transform: translateX(0); opacity: 1; }
+		}
+
+		@keyframes bounceIn {
+			0% { transform: scale(0.3); opacity: 0; }
+			50% { transform: scale(1.05); }
+			70% { transform: scale(0.9); }
+			100% { transform: scale(1); opacity: 1; }
+		}
+
+		/* Экран загрузки */
+		#loading-screen {
+			position: fixed;
+			top: 0;
+			left: 0;
+			width: 100%;
+			height: 100%;
+			background: linear-gradient(135deg, var(--primary-color), var(--secondary-color), var(--accent-color));
+			display: flex;
+			flex-direction: column;
+			justify-content: center;
+			align-items: center;
+			z-index: 9999;
+			transition: opacity 0.5s ease;
+		}
+		
+		.loading-logo {
+			margin-bottom: 30px;
+			text-align: center;
+			animation: bounceIn 1.5s ease;
+		}
+		
+		.loading-logo-image {
+			width: 80px;
+			height: 80px;
+			border-radius: 8px;
+			margin-bottom: 10px;
+			object-fit: contain;
+		}
+		
+		.loading-logo-text h1 {
+			font-size: 2.2rem;
+			color: white;
+			margin-bottom: 5px;
+			text-shadow: 0 2px 5px rgba(0,0,0,0.3);
+		}
+		
+		.loading-logo-text p {
+			font-size: 0.9rem;
+		}
+		
+		.progress-container {
+			width: 300px;
+			height: 20px;
+			background-color: rgba(255,255,255,0.3);
+			border-radius: 10px;
+			overflow: hidden;
+			border: 2px solid rgba(255,255,255,0.5);
+		}
+		
+		.progress-bar {
+			height: 100%;
+			width: 0%;
+			background: linear-gradient(90deg, var(--accent-color), var(--warning-color));
+			border-radius: 8px;
+			transition: width 0.3s ease;
+			box-shadow: 0 0 10px var(--accent-color);
+		}
+		
+		.loading-text {
+			margin-top: 15px;
+			color: white;
+			font-size: 0.9rem;
+			text-shadow: 0 1px 3px rgba(0,0,0,0.3);
+		}
+
+		/* Шапка */
+		header {
+			background: linear-gradient(135deg, var(--primary-color), var(--secondary-color), #2980b9);
+			color: white;
+			padding: 0.5rem 0;
+			box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+			position: sticky;
+			top: 0;
+			z-index: 100;
+		}
+		
+		.container {
+			width: 90%;
+			max-width: 1200px;
+			margin: 0 auto;
+		}
+		
+		.header-content {
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+		}
+		
+		.logo {
+			display: flex;
+			align-items: center;
+			gap: 10px;
+		}
+		
+		.logo-image {
+			width: 50px;
+			height: 50px;
+			border-radius: 8px;
+			object-fit: contain;
+		}
+		
+		.logo-text h1 {
+			font-size: 1.4rem;
+			margin-bottom: 3px;
+			background: linear-gradient(135deg, white, #f0f8ff);
+			-webkit-background-clip: text;
+			-webkit-text-fill-color: transparent;
+			background-clip: text;
+		}
+		
+		.logo-text p {
+			font-size: 0.8rem;
+			opacity: 0.9;
+		}
+		
+		nav ul {
+			display: flex;
+			list-style: none;
+		}
+		
+		nav ul li {
+			margin-left: 15px;
+		}
+		
+		nav ul li a {
+			color: white;
+			text-decoration: none;
+			font-weight: 500;
+			padding: 6px 12px;
+			border-radius: 4px;
+			transition: all 0.3s ease;
+			font-size: 1rem;
+		}
+		
+		nav ul li a:hover, nav ul li a.active {
+			background-color: rgba(255, 255, 255, 0.2);
+		}
+
+		/* Главный контент */
+		.main-content {
+			flex: 1;
+			width: 100%;
+		}
+
+		/* Главный заголовок - КРАСИВЫЙ СИНИЙ БЛОК С КРУГАМИ */
+		.main-header {
+			text-align: center;
+			padding: 80px 0;
+			background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+			color: white;
+			border-radius: 15px;
+			box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+			position: relative;
+			overflow: hidden;
+			margin: 20px 0;
+		}
+
+		.main-header h1 {
+			font-size: 3.5rem;
+			margin: 0;
+			text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+			background: linear-gradient(135deg, white, #e6f2ff);
+			-webkit-background-clip: text;
+			-webkit-text-fill-color: transparent;
+			background-clip: text;
+		}
+
+		.main-header h2 {
+			font-size: 2rem;
+			margin: 10px 0;
+			background: linear-gradient(135deg, #e6f2ff, #cce5ff);
+			-webkit-background-clip: text;
+			-webkit-text-fill-color: transparent;
+			background-clip: text;
+		}
+
+		.main-header h3 {
+			font-size: 1.2rem;
+			margin: 10px 0;
+			font-weight: normal;
+			background: linear-gradient(135deg, #cce5ff, #b3d9ff);
+			-webkit-background-clip: text;
+			-webkit-text-fill-color: transparent;
+			background-clip: text;
+		}
+
+		/* Анимация кругов - КАК В ПЕРВОМ ПРИМЕРЕ */
+		.circles {
+			position: absolute;
+			top: 0;
+			left: 0;
+			width: 100%;
+			height: 100%;
+			overflow: hidden;
+		}
+
+		.circles li {
+			position: absolute;
+			display: block;
+			list-style: none;
+			width: 20px;
+			height: 20px;
+			background: rgba(255, 255, 255, 0.2);
+			animation: animate 25s linear infinite;
+			bottom: -150px;
+		}
+
+		.circles li:nth-child(1) {
+			left: 25%;
+			width: 30px;
+			height: 30px;
+			animation-delay: 0s;
+		}
+
+		.circles li:nth-child(2) {
+			left: 10%;
+			width: 20px;
+			height: 20px;
+			animation-delay: 2s;
+			animation-duration: 10s;
+		}
+
+		.circles li:nth-child(3) {
+			left: 70%;
+			width: 20px;
+			height: 20px;
+			animation-delay: 4s;
+		}
+
+		.circles li:nth-child(4) {
+			left: 40%;
+			width: 40px;
+			height: 40px;
+			animation-delay: 0s;
+			animation-duration: 13s;
+		}
+
+		.circles li:nth-child(5) {
+			left: 65%;
+			width: 20px;
+			height: 20px;
+			animation-delay: 0s;
+		}
+
+		.circles li:nth-child(6) {
+			left: 75%;
+			width: 50px;
+			height: 50px;
+			animation-delay: 3s;
+		}
+
+		.circles li:nth-child(7) {
+			left: 35%;
+			width: 70px;
+			height: 70px;
+			animation-delay: 7s;
+		}
+
+		.circles li:nth-child(8) {
+			left: 50%;
+			width: 25px;
+			height: 25px;
+			animation-delay: 15s;
+			animation-duration: 35s;
+		}
+		.circles li:nth-child(9) {
+			left: 20%;
+			width: 15px;
+			height: 15px;
+			animation-delay: 2s;
+			animation-duration: 25s;
+		}
+
+		.circles li:nth-child(10) {
+			left: 85%;
+			width: 70px;
+			height: 70px;
+			animation-delay: 0s;
+			animation-duration: 10s;
+		}
+
+		@keyframes animate {
+			0% {
+				transform: translateY(0) rotate(0deg);
+				opacity: 1;
+				border-radius: 0;
+			}
+			100% {
+				transform: translateY(-1000px) rotate(720deg);
+				opacity: 0;
+				border-radius: 50%;
+			}
+		}
+
+		/* Разделитель - ГРАДИЕНТНАЯ ПОЛОСКА */
+		.poloskun {
+			background: linear-gradient(90deg, var(--primary-color), var(--accent-color), var(--accent-secondary), var(--success-color), var(--primary-color));
+			width: 100%;
+			height: 4px;
+			margin: 30px 0;
+			border-radius: 2px;
+			background-size: 200% 100%;
+			animation: gradientShift 3s ease infinite;
+		}
+
+		@keyframes gradientShift {
+			0% { background-position: 0% 50%; }
+			50% { background-position: 100% 50%; }
+			100% { background-position: 0% 50%; }
+		}
+
+		/* Секции */
+		.section {
+			display: none;
+			padding: 60px 0;
+			position: relative;
+		}
+
+		.section.active {
+			display: block;
+		}
+
+		.section-title {
+			text-align: center;
+			margin-bottom: 40px;
+			position: relative;
+		}
+
+		.section-title h2 {
+			font-size: 2rem;
+			color: var(--primary-color);
+			display: inline-block;
+			padding-bottom: 10px;
+			position: relative;
+			background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+			-webkit-background-clip: text;
+			-webkit-text-fill-color: transparent;
+			background-clip: text;
+		}
+
+		/* Карточки С ГРАДИЕНТАМИ */
+		.card {
+			background: linear-gradient(135deg, #ffffff, #f8f9fa, #e9ecef);
+			padding: 30px;
+			border-radius: 15px;
+			box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+			margin-bottom: 30px;
+			opacity: 0;
+			transform: translateY(20px);
+			transition: all 0.5s ease;
+			border-left: 4px solid;
+			border-image: linear-gradient(135deg, var(--accent-color), var(--warning-color)) 1;
+		}
+
+		.card.visible {
+			opacity: 1;
+			transform: translateY(0);
+		}
+
+		.card:hover {
+			transform: translateY(-5px);
+			box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+			background: linear-gradient(135deg, #ffffff, #f0f8ff, #e6f2ff);
+		}
+
+		.card h2, .card h3 {
+			background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+			-webkit-background-clip: text;
+			-webkit-text-fill-color: transparent;
+			background-clip: text;
+		}
+
+		/* Сетки */
+		.grid {
+			display: grid;
+			grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+			gap: 25px;
+		}
+
+		.member-card, .service-card, .news-card {
+			background: linear-gradient(135deg, #ffffff, #f8f9fa);
+			border-radius: 10px;
+			overflow: hidden;
+			box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+			transition: all 0.3s ease;
+			opacity: 0;
+			transform: translateY(20px);
+			border-top: 3px solid;
+			border-image: linear-gradient(90deg, var(--primary-color), var(--secondary-color)) 1;
+		}
+
+		.member-card.visible, .service-card.visible, .news-card.visible {
+			opacity: 1;
+			transform: translateY(0);
+		}
+
+		.member-card:hover, .service-card:hover, .news-card:hover {
+			transform: translateY(-5px);
+			box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+			background: linear-gradient(135deg, #ffffff, #f0f8ff);
+		}
+
+		.member-body, .service-body, .news-body {
+			padding: 20px;
+		}
+
+		.member-body h3, .service-body h3, .news-body h3 {
+			background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+			-webkit-background-clip: text;
+			-webkit-text-fill-color: transparent;
+			background-clip: text;
+		}
+
+		/* АВАТАРКИ АДМИНИСТРАЦИИ - МАЛЕНЬКИЕ И КРУГЛЫЕ */
+		.member-avatar {
+			width: 80px;
+			height: 80px;
+			border-radius: 50%;
+			margin: 0 auto 15px;
+			overflow: hidden;
+			box-shadow: 0 4px 15px rgba(212,175,55,0.3);
+			transition: all 0.3s ease;
+		}
+
+		.member-avatar img {
+			width: 100%;
+			height: 100%;
+			object-fit: cover;
+			display: block;
+		}
+
+		.member-card:hover .member-avatar {
+			transform: scale(1.05);
+			box-shadow: 0 6px 20px rgba(212,175,55,0.5);
+		}
+
+		.member-role {
+			color: var(--secondary-color);
+			font-weight: 500;
+			margin: 8px 0;
+			background: linear-gradient(135deg, var(--secondary-color), var(--primary-color));
+			-webkit-background-clip: text;
+			-webkit-text-fill-color: transparent;
+			background-clip: text;
+		}
+
+		/* Галерея */
+		.gallery-grid {
+			display: grid;
+			grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+			gap: 20px;
+		}
+
+		.gallery-item {
+			height: 200px;
+			background: linear-gradient(135deg, #e9ecef, #dee2e6, #ced4da);
+			border-radius: 8px;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			color: #6c757d;
+			overflow: hidden;
+			transition: all 0.3s ease;
+			opacity: 0;
+			transform: scale(0.9);
+			position: relative;
+		}
+
+		.gallery-item.visible {
+			opacity: 1;
+			transform: scale(1);
+		}
+
+		.gallery-item:hover {
+			transform: scale(1.05);
+			background: linear-gradient(135deg, #dee2e6, #ced4da, #adb5bd);
+		}
+
+		.gallery-item::before {
+			content: '';
+			position: absolute;
+			top: 0;
+			left: 0;
+			right: 0;
+			bottom: 0;
+			background: linear-gradient(45deg, rgba(212,175,55,0.1), rgba(231,76,60,0.1), rgba(39,174,96,0.1));
+			opacity: 0;
+			transition: opacity 0.3s ease;
+		}
+
+		.gallery-item:hover::before {
+			opacity: 1;
+		}
+
+		.gallery-item img {
+			width: 100%;
+			height: 100%;
+			object-fit: cover;
+		}
+
+		/* Форма */
+		.form-group {
+			margin-bottom: 20px;
+		}
+
+		.form-group label {
+			display: block;
+			margin-bottom: 8px;
+			font-weight: 500;
+			background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+			-webkit-background-clip: text;
+			-webkit-text-fill-color: transparent;
+			background-clip: text;
+		}
+
+		.form-control {
+			width: 100%;
+			padding: 12px;
+			border: 2px solid;
+			border-image: linear-gradient(135deg, #e9ecef, #dee2e6) 1;
+			border-radius: 5px;
+			font-size: 1rem;
+			font-family: 'Exo', sans-serif;
+			transition: all 0.3s ease;
+			background: linear-gradient(135deg, #f8f9fa, #ffffff);
+		}
+
+		.form-control:focus {
+			outline: none;
+			border-image: linear-gradient(135deg, var(--accent-color), var(--warning-color)) 1;
+			box-shadow: 0 0 0 3px rgba(212,175,55,0.1);
+			background: linear-gradient(135deg, #ffffff, #f0f8ff);
+		}
+
+		textarea.form-control {
+			min-height: 120px;
+			resize: vertical;
+		}
+
+		.btn {
+			display: inline-block;
+			background: linear-gradient(135deg, var(--accent-color), var(--warning-color), var(--accent-secondary));
+			color: white;
+			padding: 12px 30px;
+			border-radius: 5px;
+			text-decoration: none;
+			font-weight: bold;
+			transition: all 0.3s ease;
+			border: none;
+			cursor: pointer;
+			font-size: 1rem;
+			font-family: 'Exo', sans-serif;
+			box-shadow: 0 4px 15px rgba(212,175,55,0.3);
+			position: relative;
+			overflow: hidden;
+		}
+
+		.btn::before {
+			content: '';
+			position: absolute;
+			top: 0;
+			left: -100%;
+			width: 100%;
+			height: 100%;
+			background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+			transition: left 0.5s;
+		}
+
+		.btn:hover::before {
+			left: 100%;
+		}
+
+		.btn:hover {
+			transform: translateY(-2px);
+			box-shadow: 0 6px 20px rgba(212,175,55,0.4);
+			background: linear-gradient(135deg, var(--warning-color), var(--accent-secondary), var(--accent-color));
+		}
+
+		/* Футер - ЧЕРНЫЙ С ГРАДИЕНТАМИ */
+		footer {
+			background: linear-gradient(135deg, var(--dark-color), #2c3e50, #34495e);
+			color: white;
+			padding: 40px 0 15px;
+			margin-top: auto;
+			width: 100%;
+		}
+		
+		.footer-content {
+			display: grid;
+			grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+			gap: 25px;
+			margin-bottom: 25px;
+		}
+		
+		.footer-column h3 {
+			font-size: 1.1rem;
+			margin-bottom: 15px;
+			position: relative;
+			padding-bottom: 8px;
+			background: linear-gradient(135deg, var(--accent-color), var(--warning-color));
+			-webkit-background-clip: text;
+			-webkit-text-fill-color: transparent;
+			background-clip: text;
+		}
+		
+		.footer-column h3::after {
+			content: '';
+			position: absolute;
+			width: 35px;
+			height: 2px;
+			background: linear-gradient(90deg, var(--accent-color), var(--warning-color));
+			bottom: 0;
+			left: 0;
+			border-radius: 2px;
+		}
+		
+		.footer-column ul {
+			list-style: none;
+		}
+		
+		.footer-column ul li {
+			margin-bottom: 8px;
+		}
+		
+		.footer-column ul li a {
+			color: #aaa;
+			text-decoration: none;
+			transition: all 0.3s ease;
+			font-size: 0.9rem;
+		}
+		
+		.footer-column ul li a:hover {
+			color: white;
+			background: linear-gradient(135deg, var(--accent-color), transparent);
+			-webkit-background-clip: text;
+			-webkit-text-fill-color: transparent;
+			background-clip: text;
+		}
+		
+		.copyright {
+			text-align: center;
+			padding-top: 15px;
+			border-top: 1px solid;
+			border-image: linear-gradient(90deg, transparent, var(--accent-color), transparent) 1;
+			color: #aaa;
+			font-size: 0.85rem;
+		}
+
+		/* Адаптивность */
+		@media (max-width: 768px) {
+			.header-content {
+				flex-direction: column;
+				text-align: center;
+				gap: 10px;
+			}
+			
+			.logo {
+				justify-content: center;
+			}
+			
+			.logo-image {
+				width: 40px;
+				height: 40px;
+			}
+			
+			.logo-text h1 {
+				font-size: 1.1rem;
+			}
+			
+			.logo-text p {
+				font-size: 0.7rem;
+			}
+			
+			nav ul {
+				margin-top: 10px;
+				flex-wrap: wrap;
+				justify-content: center;
+				gap: 5px;
+			}
+			
+			nav ul li {
+				margin-left: 0;
+			}
+			
+			nav ul li a {
+				padding: 5px 10px;
+				font-size: 0.9rem;
+			}
+			
+			.main-header {
+				padding: 50px 0;
+				margin: 10px 0;
+			}
+			
+			.main-header h1 {
+				font-size: 2.5rem;
+			}
+			
+			.main-header h2 {
+				font-size: 1.5rem;
+			}
+			
+			.section {
+				padding: 40px 0;
+			}
+			
+			.section-title {
+				margin-bottom: 30px;
+			}
+			
+			.section-title h2 {
+				font-size: 1.6rem;
+			}
+			
+			.card {
+				padding: 20px;
+			}
+			
+			.grid {
+				grid-template-columns: 1fr;
+				gap: 20px;
+			}
+			
+			.gallery-grid {
+				grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+			}
+			
+			.gallery-item {
+				height: 150px;
+			}
+			
+			.footer-content {
+				grid-template-columns: 1fr;
+				gap: 20px;
+			}
+		}
+		
+		@media (max-width: 480px) {
+			.container {
+				width: 95%;
+			}
+			
+			.logo {
+				gap: 8px;
+			}
+			
+			.logo-image {
+				width: 35px;
+				height: 35px;
+			}
+			
+			.logo-text h1 {
+				font-size: 1rem;
+			}
+			
+			nav ul li a {
+				padding: 4px 8px;
+				font-size: 0.8rem;
+			}
+			
+			.main-header h1 {
+				font-size: 2rem;
+			}
+			
+			.main-header h2 {
+				font-size: 1.2rem;
+			}
+			
+			.section {
+				padding: 30px 0;
+			}
+			
+			.section-title h2 {
+				font-size: 1.4rem;
+			}
+			
+			.card {
+				padding: 15px;
+			}
+			
+			.gallery-grid {
+				grid-template-columns: 1fr;
+			}
+			
+			.btn {
+				padding: 10px 20px;
+				font-size: 0.9rem;
+				width: 100%;
+			}
+			
+			.member-avatar {
+				width: 70px;
+				height: 70px;
+			}
+		}
+	</style>
+</head>
+<body>
+	<!-- Экран загрузки -->
+	<div id="loading-screen">
+		<div class="loading-logo">
+			<img src="https://i.ibb.co/sdhtVfSN/98bce2dfaf0a11f09db0b6959547d23e-4-1.png" alt="Oasis Logo" class="loading-logo-image">
+			<div class="loading-logo-text">
+				<h1>Oasis</h1>
+				<p>Город на сервере Politmine</p>
+			</div>
+		</div>
+		<div class="progress-container">
+			<div class="progress-bar" id="progress-bar"></div>
+		</div>
+		<div class="loading-text" id="loading-text">Загрузка...</div>
+	</div>
+
+	<!-- Шапка с навигацией -->
+	<header>
+		<div class="container">
+			<div class="header-content">
+				<div class="logo">
+					<img src="https://i.ibb.co/sdhtVfSN/98bce2dfaf0a11f09db0b6959547d23e-4-1.png" alt="Oasis Logo" class="logo-image">
+					<div class="logo-text">
+						<h1>Oasis</h1>
+						<p>Город на сервере Politmine</p>
+					</div>
+				</div>
+				<nav>
+					<ul>
+						<li><a href="#" class="nav-link active" data-target="home">Главная</a></li>
+						<li><a href="#" class="nav-link" data-target="administration">Администрация</a></li>
+						<li><a href="#" class="nav-link" data-target="gallery">Галерея</a></li>
+						<li><a href="#" class="nav-link" data-target="news">Новости</a></li>
+						<li><a href="#" class="nav-link" data-target="trade">Услуги</a></li>
+						<li><a href="#" class="nav-link" data-target="contacts">Контакты</a></li>
+					</ul>
+				</nav>
+			</div>
+		</div>
+	</header>
+
+	<!-- Основной контент -->
+	<div class="main-content">
+		<div class="container">
+			<!-- КРАСИВЫЙ СИНИЙ БЛОК С КРУГАМИ -->
+			<div class="main-header">
+				<h1>Oasis</h1>
+				<h2>Город возможностей в мире Minecraft</h2>
+				<h3>Сердце торговли и прогресса на сервере PolitMine</h3>
+				<ul class="circles">
+					<li></li>
+					<li></li>
+					<li></li>
+					<li></li>
+					<li></li>
+					<li></li>
+					<li></li>
+					<li></li>
+					<li></li>
+					<li></li>
+				</ul>
+			</div>
+
+			<div class="poloskun"></div>
+
+			<!-- Секция Главная -->
+			<section id="home" class="section active">
+				<div class="card">
+					<h2>Oasis — город возможностей в мире Minecraft</h2>
+					<p>Oasis — динамично развивающийся промышленно‑торговый город, раскинувшийся на пересечении ключевых торговых путей сервера PolitMine. Город сочетает мощь индустриальных кварталов с оживлённой коммерческой жизнью, привлекая ремесленников и торговцев.</p>
+				</div>
+
+				<div class="card">
+					<h3>🏭 Ключевые особенности:</h3>
+					
+					<h4 style="margin-top: 20px; color: var(--primary-color);">🏗️ Промышленный район</h4>
+					<p>Цехи и фабрики с автоматическими системами переработки обеспечивают город и соседей готовой продукцией. Дымящиеся трубы, гул механизмов и мерцание плавильных печей создают неповторимый индустриальный пейзаж.</p>
+					
+					<h4 style="margin-top: 20px; color: var(--primary-color);">💰 Торговый квартал</h4>
+					<p>Центр города с зданием совета, товарными лавками и представительствами других городов. Здесь заключаются крупные сделки и обсуждаются проекты развития.</p>
+					
+					<h4 style="margin-top: 20px; color: var(--primary-color);">🏠 Жилые кварталы</h4>
+					<p>Уютные дома для рабочих и гостевые постоялые дворы — в Oasis найдётся жильё для каждого.</p>
+					
+					<h4 style="margin-top: 20px; color: var(--primary-color);">🎪 Квартал развлечений</h4>
+					<p>Место в Oasis где вы можете приятно провести время. Здесь собраны различные казино, тиры, бары и другие развлекательные заведения.</p>
+				</div>
+
+				<div class="card">
+					<h3>⭐ Чем славится Oasis:</h3>
+					
+					<h4 style="margin-top: 15px; color: var(--secondary-color);">📦 Разнообразие товаров</h4>
+					<p>От руды и древесины до зачарованных предметов и редких семян — в местных лавках есть всё.</p>
+					
+					<h4 style="margin-top: 15px; color: var(--secondary-color);">⚡ Инновации</h4>
+					<p>Местные инженеры постоянно совершенствуют механизмы: автоматические фермы, сортировочные системы, энергосети на редстоуне.</p>
+				</div>
+
+				<div class="card">
+					<h3>‼️ Почему стоит посетить?</h3>
+					<p>Oasis — это место, где можно:</p>
+					<ul style="margin-left: 20px; margin-top: 10px;">
+						<li>продать добычу по выгодной цене;</li>
+						<li>закупить ресурсы для масштабных проектов;</li>
+						<li>найти команду для рейда или построить собственное производство;</li>
+						<li>насладиться атмосферой бурлящего мегаполиса в пиксельном мире.</li>
+					</ul>
+					
+					<p style="margin-top: 20px; font-weight: bold; color: var(--accent-color);">
+						Добро пожаловать в Oasis — сердце торговли и прогресса!
+						</p>
+				</div>
+			</section>
+
+			<!-- Секция Администрация -->
+			<section id="administration" class="section">
+				<div class="section-title">
+					<h2>Администрация города</h2>
+				</div>
+
+				<div class="grid">
+					<div class="member-card">
+						<div class="member-body">
+							<div class="member-avatar">
+								<img src="https://i.ibb.co/twX3rVL1/3a7b2910b2e5765ab3dc8d99a5db01b3.png" alt="Мэр Oasis">
+							</div>
+							<h3>Мэр Oasis</h3>
+							<div class="member-role">everlast1ng</div>
+							<p>Ответственный за стратегическое развитие города и общее руководство.</p>
+						</div>
+					</div>
+
+					<div class="member-card">
+						<div class="member-body">
+							<div class="member-avatar">
+								<img src="https://i.ibb.co/wFqPX4bs/d3e83211aaddc91d5703323374a4fa9c.png" alt="Вицемер Oasis">
+							</div>
+							<h3>Вицемер Oasis</h3>
+							<div class="member-role">Seal48</div>
+							<p>Активно участвует в развитии города, помогает мэру с его обязанностями</p>
+						</div>
+					</div>
+					
+					<div class="member-card">
+						<div class="member-body">
+							<div class="member-avatar">
+								<img src="https://i.ibb.co/fdZbFkBq/994663867db7179b3ac4aa24302e61b4.png" alt="Главный строитель">
+							</div>
+							<h3>Главный строитель</h3>
+							<div class="member-role">Naza_0</div>
+							<p>Координирует строительные работы и планирование городской инфраструктуры.</p>
+						</div>
+					</div>
+
+					<div class="member-card">
+						<div class="member-body">
+							<div class="member-avatar">
+								<img src="https://i.ibb.co/QBCTTT4/IMG-1793.jpg" alt="Медиа города">
+							</div>
+							<h3>Медиа города</h3>
+							<div class="member-role">Kelderius</div>
+							<p>Ответственный за мероприятия и оповещение жителей города</p>
+						</div>
+					</div>
+				</div>
+			</section>
+
+			<!-- Секция Галерея -->
+			<section id="gallery" class="section">
+				<div class="section-title">
+					<h2>Галерея города</h2>
+				</div>
+
+				<div class="gallery-grid">
+					<div class="gallery-item">
+						<div>Промышленный район</div>
+					</div>
+					<div class="gallery-item">
+						<div>Торговый квартал</div>
+					</div>
+					<div class="gallery-item">
+						<div>Жилые кварталы</div>
+					</div>
+					<div class="gallery-item">
+						<div>Квартал развлечений</div>
+					</div>
+					<div class="gallery-item">
+						<div>Центральная площадь</div>
+					</div>
+					<div class="gallery-item">
+						<div>Городские ворота</div>
+					</div>
+				</div>
+			</section>
+
+			<!-- Секция Новости -->
+			<section id="news" class="section">
+				<div class="section-title">
+					<h2>Новости и события</h2>
+				</div>
+
+				<div class="grid">
+					<div class="news-card">
+						<div class="news-body">
+							<h3>✨ Сайт</h3>
+							<p><strong>Дата:</strong> 9 января 2026</p>
+							<p>У нас появился свой собственный сайт, который вы сейчас просматриваете!</p>
+						</div>
+					</div>
+
+					<div class="news-card">
+						<div class="news-body">
+							<h3>❗️Изменение правил</h3>
+							<p><strong>Дата:</strong> 7 января 2026</p>
+							<p>Были изменены правила общения в чате, ознакомиться с ними можно в нашем дискорд сервере.</p>
+						</div>
+					</div>
+
+					<div class="news-card">
+						<div class="news-body">
+							<h3>🗽 Новое начало</h3>
+							<p><strong>Дата:</strong> 27 декабря 2026</p>
+							<p>До вайпа остались считанные дни, в городе планируется ряд изменений в лучшую сторону.</p>
+						</div>
+					</div>
+				</div>
+			</section>
+
+			<!-- Секция Торговля -->
+			<section id="trade" class="section">
+				<div class="section-title">
+					<h2>Услуги</h2>
+				</div>
+
+				<div class="card">
+					<h3>🛒 Заказ товаров в нашем магазине в оптовых количествах:</h3>
+					<p>‎</p>
+					<ul style="margin-left: 20px; margin-top: 10px;">
+						<li>При заказе от 5 бочек предоставляется скидка 5% на весь заказ.</li>
+						<li>При заказе от 10 бочек скидка увеличивается до 10%.</li>
+					</ul>
+					<div class="poloskun" style="margin: 20px 0;"></div>
+					
+					<h3>🎨 Заказ mapart с вашим изображением</h3>
+					<p>‎</p>
+					<ul style="margin-left: 20px; margin-top: 10px;">
+						<li>Размеры готового maparta от 1×1 до 20×20 блоков</li>
+					</ul>
+					<div class="poloskun" style="margin: 20px 0;"></div>
+					
+					<h3>🏪 Открытие торгового филиала в нашем городе</h3>
+					<p>‎</p>
+					<ul style="margin-left: 20px; margin-top: 10px;">
+						<li>Покупка торговых помещений для размещения ваших товаров</li>
+					</ul>
+					<div class="poloskun" style="margin: 20px 0;"></div>
+					
+					<h3>📢 Размещение рекламных билбордов в нашем городе и городах-партнёрах</h3>
+					<p>‎</p>
+					<ul style="margin-left: 20px; margin-top: 10px;">
+						<li>Размещение рекламы в наиболее заметных местах города</li>
+					</ul>
+					<div class="poloskun" style="margin: 20px 0;"></div>
+					
+					<h3>🎨 Разработка логотипов и изображений в соответствии с вашими требованиями</h3>
+					<p>‎</p>
+					<ul style="margin-left: 20px; margin-top: 10px;">
+						<li>Логотипы магазинов</li>
+						<li>Индивидуальные изображения</li>
+					</ul>
+					
+					<div style="margin-top: 30px; padding: 20px; background: linear-gradient(135deg, rgba(5,125,235,0.1), rgba(31,145,245,0.1)); border-radius: 10px; border-left: 4px solid var(--accent-color);">
+						<h4 style="color: var(--accent-color); text-align: center;">Для получения информации и оформления услуг, пожалуйста, обратитесь в личный чат сервера:</h4>
+						<p style="text-align: center; margin-top: 10px; font-weight: bold;">
+							/m everlast1ng [текст] 
+							<br>или<br>
+							/mail send everlast1ng [текст]
+						</p>
+					</div>
+				</div>
+			</section>
+
+			<!-- Секция Контакты -->
+			<section id="contacts" class="section">
+				<div class="section-title">
+					<h2>Контакты</h2>
+				</div>
+
+				<div class="card">
+					<h3>Как нас найти</h3>
+					
+					<div class="grid">
+						<div>
+							<h4>🎮 Сервер</h4>
+							<p>Politmine (Помпей)</p>
+							
+							<h4 style="margin-top: 20px;">📍 Координаты</h4>
+							<p>X: ? Z: ?</p>
+							
+							<h4 style="margin-top: 20px;">📃 Телепорт</h4>
+							<p>/t spawn Oasis</p>
+						</div>
+						
+						<div>
+							<h4>💬 Дискорд</h4>
+							<p>https://discord.gg/VF9TpJe7</p>
+							
+							<h4 style="margin-top: 20px;">👥 Для вступления</h4>
+							<p>Напишите любому из администраторов в игре</p>
+						</div>
+					</div>
+					
+					<div style="text-align: center; margin-top: 40px; padding: 20px; background: linear-gradient(135deg, rgba(5,125,235,0.1), rgba(31,145,245,0.1)); border-radius: 10px; border-left: 4px solid var(--accent-color);">
+						<h4 style="color: var(--accent-color); margin-bottom: 20px;">Хотите присоединиться к Oasis?</h4>
+						<a href="https://docs.google.com/forms/d/e/1FAIpQLSc9ugypUhiX-pj35eoxC-9JzfTcM5hvKi5bHLiIKgN978ZJsQ/viewform?usp=header" 
+						   target="_blank" 
+						   class="btn" 
+						   style="font-size: 1.1rem; padding: 15px 40px;">
+							Подать заявку
+						</a>
+						<p style="margin-top: 15px; font-size: 0.9rem; color: #666;">
+							Нажмите на кнопку, чтобы перейти к форме заявки
+						</p>
+					</div>
+				</div>
+			</section>
+
+	<!-- Футер -->
+	<footer>
+		<div class="container">
+			<div class="footer-content">
+				<div class="footer-column">
+					<h3>Oasis</h3>
+					<p>Процветающий промышленно-торговый город на сервере Politmine, где каждый может найти своё место.</p>
+				</div>
+				
+				<div class="footer-column">
+					<h3>Навигация</h3>
+					<ul>
+						<li><a href="#" class="nav-link" data-target="home">Главная</a></li>
+						<li><a href="#" class="nav-link" data-target="administration">Администрация</a></li>
+						<li><a href="#" class="nav-link" data-target="gallery">Галерея</a></li>
+						<li><a href="#" class="nav-link" data-target="news">Новости</a></li>
+						<li><a href="#" class="nav-link" data-target="trade">Услуги</a></li>
+						<li><a href="#" class="nav-link" data-target="contacts">Контакты</a></li>
+					</ul>
+				</div>
+				
+				<div class="footer-column">
+					<h3>Полезные ссылки</h3>
+					<ul>
+						<li><a href="https://discord.com/channels/1454115442716053786/1454121244193456261">Правила города</a></li>
+						<li><a href="https://discord.com/channels/1454115442716053786/1454241957688643735">Роли и должности</a></li>
+						<li><a href="https://discord.com/channels/1454115442716053786/1454124972581720084">Ивенты</a></li>
+						<li><a href="https://discord.com/channels/1454115442716053786/1458656344466001971">Описание города</a></li>
+					</ul>
+				</div>
+				
+				<div class="footer-column">
+					<h3>Сервер Politmine</h3>
+					<ul>
+						<li><a href="https://politmine.ru">Официальный сайт</a></li>
+						<li><a href="https://discord.gg/politmine-583776970035167242">Дискорд сервер</a></li>
+						<li><a href="https://politmine.ru/rules">Правила сервера</a></li>
+						<li><a href="https://pompey.politmine.ru/#world;flat;21438,64,5341;0">Карта Помпея</a></li>
+					</ul>
+				</div>
+			</div>
+			
+			<div class="copyright">
+				<p>&copy; 2025-2026 Город Oasis | Сервер Politmine.</p>
+			</div>
+		</div>
+	</footer>
+
+	<script>
+		document.addEventListener('DOMContentLoaded', function() {
+			const loadingScreen = document.getElementById('loading-screen');
+			const progressBar = document.getElementById('progress-bar');
+			const loadingText = document.getElementById('loading-text');
+			
+			let progress = 0;
+			const interval = setInterval(() => {
+				progress += Math.random() * 15;
+				if (progress > 100) progress = 100;
+				
+				progressBar.style.width = progress + '%';
+				
+				if (progress < 30) {
+					loadingText.textContent = 'Загрузка ресурсов...';
+				} else if (progress < 60) {
+					loadingText.textContent = 'Инициализация компонентов...';
+				} else if (progress < 90) {
+					loadingText.textContent = 'Подготовка интерфейса...';
+				} else {
+					loadingText.textContent = 'Завершение загрузки...';
+				}
+				
+				if (progress >= 100) {
+					clearInterval(interval);
+					
+					setTimeout(() => {
+						loadingScreen.style.opacity = '0';
+						setTimeout(() => {
+							loadingScreen.style.display = 'none';
+						}, 500);
+					}, 500);
+				}
+			}, 200);
+			
+			// Навигация между разделами
+			const navLinks = document.querySelectorAll('.nav-link');
+			const sections = document.querySelectorAll('.section');
+			const cards = document.querySelectorAll('.card');
+			const memberCards = document.querySelectorAll('.member-card, .service-card, .news-card');
+			const galleryItems = document.querySelectorAll('.gallery-item');
+			
+			function animateElements(elements, delay = 100) {
+				elements.forEach((element, index) => {
+					setTimeout(() => {
+						element.classList.add('visible');
+					}, index * delay);
+				});
+			}
+			
+			navLinks.forEach(link => {
+				link.addEventListener('click', function(e) {
+					e.preventDefault();
+					
+					navLinks.forEach(navLink => {
+						navLink.classList.remove('active');
+					});
+					
+					this.classList.add('active');
+					
+					sections.forEach(section => {
+						section.classList.remove('active');
+					});
+					
+					const targetId = this.getAttribute('data-target');
+					const targetSection = document.getElementById(targetId);
+					targetSection.classList.add('active');
+					
+					// Анимация элементов в зависимости от секции
+					setTimeout(() => {
+						const sectionCards = targetSection.querySelectorAll('.card');
+						const sectionMemberCards = targetSection.querySelectorAll('.member-card, .service-card, .news-card');
+						const sectionGalleryItems = targetSection.querySelectorAll('.gallery-item');
+						
+						animateElements(sectionCards, 150);
+						animateElements(sectionMemberCards, 200);
+						animateElements(sectionGalleryItems, 100);
+					}, 300);
+					
+					// Плавная прокрутка к началу секции
+					window.scrollTo({
+						top: document.querySelector('.main-header').offsetHeight + 100,
+						behavior: 'smooth'
+					});
+				});
+			});
+			
+			// Анимация элементов при загрузке
+			setTimeout(() => {
+				animateElements(document.querySelectorAll('#home .card'), 150);
+				animateElements(document.querySelectorAll('#home .member-card, #home .service-card, #home .news-card'), 200);
+			}, 500);
+			
+			// Обработка формы
+			const contactForm = document.getElementById('contactForm');
+			if (contactForm) {
+				contactForm.addEventListener('submit', function(e) {
+					e.preventDefault();
+					alert('Спасибо за вашу заявку! Мы свяжемся с вами в ближайшее время.');
+					contactForm.reset();
+				});
+			}
+		});
+	</script>
+</body>
+</html>
